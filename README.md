@@ -5,8 +5,8 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.1-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)](https://www.postgresql.org/)
-[![CI](https://github.com/YOUR_USERNAME/ai-rps/workflows/CI/badge.svg)](https://github.com/YOUR_USERNAME/ai-rps/actions)
-[![Coverage](https://img.shields.io/badge/coverage-87%25-brightgreen.svg)](https://github.com/YOUR_USERNAME/ai-rps)
+[![CI](https://github.com/navinavi029/ai-rps/workflows/CI/badge.svg)](https://github.com/navinavi029/ai-rps/actions)
+[![Coverage](https://img.shields.io/badge/coverage-87%25-brightgreen.svg)](https://github.com/navinavi029/ai-rps)
 
 > **🐳 Docker-First Architecture**: This project runs entirely in Docker containers. No local Java, Maven, PostgreSQL, or other dependencies required. Just install Docker Desktop and you're ready to go!
 
@@ -724,8 +724,8 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for deta
 
 ## Community
 
-- **Issues**: [GitHub Issues](https://github.com/YOUR_USERNAME/ai-rps/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/YOUR_USERNAME/ai-rps/discussions)
+- **Issues**: [GitHub Issues](https://github.com/navinavi029/ai-rps/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/navinavi029/ai-rps/discussions)
 - **Security**: See [SECURITY.md](SECURITY.md) for reporting vulnerabilities
 
 ## License
