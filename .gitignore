@@ -1,0 +1,60 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.bak
+
+# Application
+/app/data/
+*.log
+*.pid
+/uploads/
+/data/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Docker
+docker-compose.override.yml
+
+# Test
+*.class
+hs_err_pid*
+replay_pid*
+
+# Generated files
+analysis_report.pdf
+analysis_results.json
+enhanced_analysis_report.pdf
+final_styled_report.pdf
+*.sql.backup
+
+# Temporary files
+*.tmp
+*.temp
