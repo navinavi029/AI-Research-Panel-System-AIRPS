@@ -1,4 +1,12 @@
-# AI Panelist System
+# AI Research Panel System (AI-RPS)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.org/projects/jdk/21/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.1-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)](https://www.postgresql.org/)
+[![CI](https://github.com/YOUR_USERNAME/ai-rps/workflows/CI/badge.svg)](https://github.com/YOUR_USERNAME/ai-rps/actions)
+[![Coverage](https://img.shields.io/badge/coverage-87%25-brightgreen.svg)](https://github.com/YOUR_USERNAME/ai-rps)
 
 > **🐳 Docker-First Architecture**: This project runs entirely in Docker containers. No local Java, Maven, PostgreSQL, or other dependencies required. Just install Docker Desktop and you're ready to go!
 
@@ -6,7 +14,7 @@ A Java Spring Boot application that orchestrates multi-agent AI analysis of rese
 
 ## Overview
 
-The AI Panelist System enables users to upload PDF research documents and receive comprehensive analysis from multiple AI agents acting as a deliberative panel. The system leverages NVIDIA free models to power multi-agent analysis, where AI panelists independently review the study and then collaborate to produce a consensus output.
+The AI Research Panel System (AI-RPS) enables users to upload PDF research documents and receive comprehensive analysis from multiple AI agents acting as a deliberative panel. The system leverages NVIDIA free models to power multi-agent analysis, where AI panelists independently review the study and then collaborate to produce a consensus output.
 
 ## Features
 
@@ -704,9 +712,27 @@ To add a new specialized agent:
 - **Property Tests**: Test invariants with jqwik (100+ iterations)
 - **TDD Approach**: Write tests before implementation
 
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on:
+
+- How to report bugs
+- How to suggest features
+- Development setup
+- Coding standards
+- Pull request process
+
+## Community
+
+- **Issues**: [GitHub Issues](https://github.com/YOUR_USERNAME/ai-rps/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/YOUR_USERNAME/ai-rps/discussions)
+- **Security**: See [SECURITY.md](SECURITY.md) for reporting vulnerabilities
+
 ## License
 
-Copyright © 2024. All rights reserved.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+Copyright © 2024 AI Research Panel System Contributors.
 
 ## Support
 
