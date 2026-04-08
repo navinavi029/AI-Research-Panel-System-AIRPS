@@ -39,15 +39,17 @@ echo.
 echo Choose deployment mode:
 echo 1. Production (default)
 echo 2. Development (with hot reload and debug)
-echo 3. Production with Nginx
 echo.
-set /p MODE="Enter your choice (1-3) [1]: "
+set /p MODE="Enter your choice (1-2) [1]: "
 if "%MODE%"=="" set MODE=1
 
 if "%MODE%"=="1" (
     echo.
     echo Starting in production mode...
     docker-compose up -d
+    echo.
+    echo Production environment started:
+    echo - Application: http://localhost:8080
     
 ) else if "%MODE%"=="2" (
     echo.
@@ -58,15 +60,6 @@ if "%MODE%"=="1" (
     echo - Application: http://localhost:8080
     echo - PgAdmin: http://localhost:5050
     echo - Debug port: 5005
-    
-) else if "%MODE%"=="3" (
-    echo.
-    echo Starting in production mode with Nginx...
-    docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-    echo.
-    echo Production environment started:
-    echo - Application: http://localhost:80
-    echo - HTTPS: http://localhost:443 (if SSL configured)
     
 ) else (
     echo Invalid choice

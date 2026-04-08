@@ -65,17 +65,17 @@ dev-logs:
 dev-down:
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml --profile dev down
 
-# Production mode
+# Production mode (same as default 'up' command)
 prod:
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+	docker-compose up -d
 	@echo "Production environment started"
-	@echo "Application: http://localhost:80"
+	@echo "Application: http://localhost:8080"
 
 prod-logs:
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml logs -f
+	docker-compose logs -f
 
 prod-down:
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml down
+	docker-compose down
 
 # Show service status
 status:

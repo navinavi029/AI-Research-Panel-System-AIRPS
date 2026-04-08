@@ -49,425 +49,104 @@ That's it! No Java, Maven, PostgreSQL, or any other local dependencies needed. E
 
 ## Quick Start
 
-### 1. Get NVIDIA API Key
+**New to the system?** See [GETTING-STARTED.md](GETTING-STARTED.md) for a detailed step-by-step guide.
 
-1. Visit https://build.nvidia.com/
-2. Sign up for a free account
-3. Navigate to API Keys section
-4. Generate a new API key
-5. Copy the key for configuration
+### 1. Prerequisites
 
-### 2. Start with Docker (Recommended)
+- **Docker Desktop** - [Download here](https://www.docker.com/products/docker-desktop)
+- **NVIDIA API Key** (free) - [Get it here](https://build.nvidia.com/)
 
-#### Windows Users - One Command Start
+### 2. Configure Environment
 
+```bash
+# Create environment file
+cp .env.example .env
+
+# Edit .env and add your NVIDIA API key
+NVIDIA_API_KEY=your-api-key-here
+```
+
+### 3. Start the Application
+
+**Windows:**
 ```cmd
 docker-start.bat
 ```
 
-This will:
-- Check if Docker is running
-- Create .env file from template
-- Let you choose deployment mode (Production/Development/Production+Nginx)
-- Start all services automatically
-
-#### Linux/Mac Users - Using Make
-
+**Linux/Mac:**
 ```bash
-# Production mode
 make up
-
-# Development mode (with hot reload and debugging)
-make dev
-
-# Production with Nginx (SSL/TLS ready)
-make prod
 ```
 
-#### Manual Docker Start
+### 4. Verify It's Working
 
-1. Create `.env` file from template:
-   ```bash
-   cp .env.example .env
-   ```
+Open your browser: http://localhost:8080/actuator/health
 
-2. Edit `.env` and set your NVIDIA API key:
-   ```
-   NVIDIA_API_KEY=your-api-key-here
-   ```
+You should see `{"status":"UP"}`
 
-3. Start services:
-   ```bash
-   # Production
-   docker-compose up -d
-   
-   # Development (with hot reload)
-   docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
-   
-   # Production with Nginx
-   docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-   ```
+### 5. Test the API
 
-### 3. Access the Application
-
-- **API**: http://localhost:8080
-- **Health Check**: http://localhost:8080/actuator/health
-- **PgAdmin** (dev mode only): http://localhost:5050
-
-### 4. Docker Management Commands
-
-#### Windows Batch Files
-
-```cmd
-docker-start.bat   # Start services (interactive mode selection)
-docker-stop.bat    # Stop services (with cleanup options)
-docker-logs.bat    # View logs (with filtering)
-docker-health.bat  # Check health and quick actions
+Visit the interactive API documentation:
+```
+http://localhost:8080/swagger-ui.html
 ```
 
-#### Make Commands (Linux/Mac/Windows with Make)
+See [API-GUIDE.md](API-GUIDE.md) for detailed API testing instructions.
 
-```bash
-make help          # Show all available commands
-make status        # Show service status
-make logs          # View logs
-make health        # Check application health
-make shell         # Open shell in app container
-make db-shell      # Open PostgreSQL shell
-make backup-db     # Backup database
-make clean         # Remove everything
-```
+---
 
-### 5. Development Mode Features
+## Documentation
 
-Development mode includes:
-- **Hot reload** - Code changes automatically restart the app
-- **Remote debugging** - Debug port 5005
-- **PgAdmin** - Database management UI at http://localhost:5050
-- **Verbose logging** - TRACE level for debugging
+📚 **[Complete Documentation Guide](.github/DOCUMENTATION.md)** - Visual guide to all documentation
 
-Start development mode:
-```bash
-# Windows
-docker-start.bat  # Choose option 2
-
-# Linux/Mac
-make dev
-```
-
-### 6. Running Tests in Docker
-
-```bash
-# Run all tests inside Docker container
-docker-compose exec app mvn test
-
-# Or using Make
-make test
-
-# Run specific test
-docker-compose exec app mvn test -Dtest=DocumentControllerTest
-```
-
-See [README-DOCKER.md](README-DOCKER.md) for comprehensive Docker deployment documentation.
+- **[GETTING-STARTED.md](GETTING-STARTED.md)** - Complete setup guide for new users
+- **[API-GUIDE.md](API-GUIDE.md)** - API endpoints and testing guide
+- **[DOCKER-GUIDE.md](DOCKER-GUIDE.md)** - Docker deployment and management
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute to the project
+- **[SECURITY.md](SECURITY.md)** - Security policy and best practices
 
 ## Docker Architecture
 
-### Container Services
+The application runs in Docker containers with no local dependencies required. See [DOCKER-GUIDE.md](DOCKER-GUIDE.md) for comprehensive deployment documentation.
 
-The application runs in a multi-container Docker environment:
+**Container Services:**
+- **aipanelist-app** - Spring Boot application (port 8080)
+- **aipanelist-postgres** - PostgreSQL 15 database
+- **aipanelist-pgadmin** - Database UI (dev mode only)
 
-1. **aipanelist-app** - Spring Boot application
-   - Built with multi-stage Dockerfile
-   - Runs on port 8080
-   - Connects to PostgreSQL
-   - Mounts volume for file uploads
-
-2. **aipanelist-postgres** - PostgreSQL 15 database
-   - Persistent data storage
-   - Automatic initialization scripts
-   - Health checks enabled
-   - Optimized for production
-
-3. **aipanelist-pgadmin** (dev mode only)
-   - Database management UI
-   - Accessible at http://localhost:5050
-   - Default credentials in .env
-
-4. **aipanelist-nginx** (prod mode only)
-   - Reverse proxy
-   - Rate limiting
-   - SSL/TLS termination
-   - Load balancing ready
-
-### Docker Compose Profiles
-
-Three deployment profiles are available:
-
-#### 1. Production (Default)
-```bash
-docker-compose up -d
-```
-- Optimized JVM settings
-- Minimal logging
-- Resource limits enforced
-- Auto-restart enabled
-
-#### 2. Development
-```bash
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
-```
-- Hot reload enabled
-- Remote debugging on port 5005
-- PgAdmin included
-- Verbose logging
-- Source code mounted
-
-#### 3. Production with Nginx
-```bash
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-```
-- Nginx reverse proxy
-- Rate limiting
-- SSL/TLS support
-- Production PostgreSQL tuning
-- Higher resource limits
-
-### Volume Management
-
-Persistent data is stored in Docker volumes:
-
-- **postgres-data** - Database files
-- **upload-data** - Uploaded PDF documents
-- **pgadmin-data** - PgAdmin configuration (dev mode)
-
-Backup database:
-```bash
-make backup-db
-# or
-docker-compose exec -T postgres pg_dump -U aipanelist aipanelist > backup.sql
-```
-
-Restore database:
-```bash
-make restore-db FILE=backup.sql
-# or
-docker-compose exec -T postgres psql -U aipanelist aipanelist < backup.sql
-```
-
-### Environment Variables
-
-Configure via `.env` file:
-
-```bash
-# Required
-NVIDIA_API_KEY=your-api-key-here
-
-# Optional (with defaults)
-POSTGRES_PASSWORD=changeme
-SERVER_PORT=8080
-LOG_LEVEL_ROOT=INFO
-LOG_LEVEL_APP=DEBUG
-JAVA_OPTS=-Xms512m -Xmx2048m
-```
-
-### Resource Limits
-
-Default resource allocation:
-
-**Production:**
-- App: 2 CPU, 2GB RAM
-- Database: 2 CPU, 2GB RAM
-- Nginx: 0.5 CPU, 256MB RAM
-
-**Development:**
-- App: 1 CPU, 512MB RAM
-- Database: 1 CPU, 512MB RAM
-
-Adjust in docker-compose files as needed.
+**Deployment Modes:**
+- **Production** - Optimized for production use
+- **Development** - Hot reload, debugging, PgAdmin
 
 ## API Documentation
 
-### Base URL
+The system provides a RESTful API for document analysis. See [API-GUIDE.md](API-GUIDE.md) for detailed testing instructions.
 
-```
-http://localhost:8080/api
-```
+**Base URL:** `http://localhost:8080/api`
 
-### Endpoints
+**Interactive Documentation:** http://localhost:8080/swagger-ui.html
 
-#### 1. Upload Document
+### Key Endpoints
 
-Upload a PDF document for analysis.
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/documents/upload` | POST | Upload PDF for analysis |
+| `/api/documents/{id}/status` | GET | Check processing status |
+| `/api/documents/{id}/results` | GET | Get consensus report |
+| `/api/documents/{id}/results/detailed` | GET | Get all agent reports |
 
-**Request:**
-```http
-POST /api/documents/upload
-Content-Type: multipart/form-data
+**Example Usage:**
 
-file: <PDF file>
-```
-
-**Response (200 OK):**
-```json
-{
-  "documentId": "550e8400-e29b-41d4-a716-446655440000",
-  "filename": "research-paper.pdf",
-  "status": "UPLOADED"
-}
-```
-
-**Error Responses:**
-- `400 Bad Request`: Invalid file (not PDF, too large, corrupted)
-- `500 Internal Server Error`: Server error during upload
-
-**Example:**
 ```bash
+# Upload a document
 curl -X POST http://localhost:8080/api/documents/upload \
   -F "file=@research-paper.pdf"
-```
 
-#### 2. Get Document Status
+# Check status
+curl http://localhost:8080/api/documents/{documentId}/status
 
-Check the processing status of a document.
-
-**Request:**
-```http
-GET /api/documents/{documentId}/status
-```
-
-**Response (200 OK):**
-```json
-{
-  "documentId": "550e8400-e29b-41d4-a716-446655440000",
-  "status": "ANALYZING",
-  "progress": {
-    "totalChunks": 3,
-    "agentProgress": [
-      {
-        "agentType": "LEAD_ANALYST",
-        "chunksCompleted": 2,
-        "totalChunks": 3
-      },
-      {
-        "agentType": "METHODOLOGY_REVIEWER",
-        "chunksCompleted": 1,
-        "totalChunks": 3
-      }
-    ]
-  },
-  "estimatedTimeRemaining": "15 minutes"
-}
-```
-
-**Status Values:**
-- `UPLOADED`: Document uploaded, awaiting processing
-- `PROCESSING`: Extracting text and chunking
-- `ANALYZING`: AI agents analyzing document
-- `DELIBERATING`: Generating consensus report
-- `COMPLETE`: Analysis complete
-- `FAILED`: Processing failed (check errorMessage)
-
-**Error Responses:**
-- `404 Not Found`: Document ID does not exist
-
-**Example:**
-```bash
-curl http://localhost:8080/api/documents/550e8400-e29b-41d4-a716-446655440000/status
-```
-
-#### 3. Get Consensus Results
-
-Retrieve the final consensus report.
-
-**Request:**
-```http
-GET /api/documents/{documentId}/results
-```
-
-**Response (200 OK):**
-```json
-{
-  "documentId": "550e8400-e29b-41d4-a716-446655440000",
-  "consensusReport": {
-    "commonThemes": [
-      "Strong methodology with appropriate statistical analysis",
-      "Limited sample size may affect generalizability"
-    ],
-    "agreements": [
-      "All agents agree the research question is well-defined",
-      "Consensus on the validity of the experimental design"
-    ],
-    "disagreements": [
-      "Lead Analyst questions the interpretation of results",
-      "Literature Reviewer suggests additional context needed"
-    ],
-    "unifiedRecommendations": [
-      "Consider expanding sample size in future studies",
-      "Strengthen discussion of limitations"
-    ],
-    "keyInsights": [
-      "Novel approach to data collection (Methodology Reviewer)",
-      "Significant contribution to existing literature (Literature Reviewer)"
-    ],
-    "generatedAt": "2024-01-15T14:30:00Z"
-  }
-}
-```
-
-**Error Responses:**
-- `404 Not Found`: Document ID does not exist
-- `202 Accepted`: Document still processing (returns current status)
-
-**Example:**
-```bash
-curl http://localhost:8080/api/documents/550e8400-e29b-41d4-a716-446655440000/results
-```
-
-#### 4. Get Detailed Results
-
-Retrieve all individual agent reports plus consensus.
-
-**Request:**
-```http
-GET /api/documents/{documentId}/results/detailed
-```
-
-**Response (200 OK):**
-```json
-{
-  "documentId": "550e8400-e29b-41d4-a716-446655440000",
-  "agentReports": [
-    {
-      "agentType": "LEAD_ANALYST",
-      "findings": "Comprehensive analysis of research methodology...",
-      "strengths": ["Clear research question", "Appropriate methods"],
-      "weaknesses": ["Limited sample size", "Potential bias"],
-      "recommendations": ["Expand sample", "Address limitations"],
-      "completedAt": "2024-01-15T14:25:00Z"
-    },
-    {
-      "agentType": "METHODOLOGY_REVIEWER",
-      "findings": "Statistical analysis review...",
-      "strengths": ["Robust statistical tests", "Clear reporting"],
-      "weaknesses": ["Missing power analysis"],
-      "recommendations": ["Include power calculations"],
-      "completedAt": "2024-01-15T14:26:00Z"
-    }
-    // ... 4 more agent reports
-  ],
-  "consensusReport": {
-    // Same structure as /results endpoint
-  }
-}
-```
-
-**Error Responses:**
-- `404 Not Found`: Document ID does not exist
-- `202 Accepted`: Document still processing
-
-**Example:**
-```bash
-curl http://localhost:8080/api/documents/550e8400-e29b-41d4-a716-446655440000/results/detailed
+# Get results
+curl http://localhost:8080/api/documents/{documentId}/results
 ```
 
 ## AI Agents
@@ -485,79 +164,39 @@ Each agent processes the document independently, then their findings are synthes
 
 ## Configuration
 
-### Environment Variables
-
-See `.env.example` for all available configuration options.
+All configuration is managed through the `.env` file. See `.env.example` for all available options.
 
 **Required:**
-- `NVIDIA_API_KEY`: Your NVIDIA API key
+```env
+NVIDIA_API_KEY=your-api-key-here
+```
 
-**Database:**
-- `DATABASE_URL`: PostgreSQL connection URL
-- `DATABASE_USERNAME`: Database username
-- `DATABASE_PASSWORD`: Database password
+**Optional (with defaults):**
+```env
+POSTGRES_PASSWORD=changeme
+SERVER_PORT=8080
+LOG_LEVEL_ROOT=INFO
+LOG_LEVEL_APP=DEBUG
+JAVA_OPTS=-Xms512m -Xmx2048m
+```
 
-**Storage:**
-- `UPLOAD_DIR`: Directory for uploaded files (default: /app/data/uploads)
-
-**Processing:**
-- `MAX_CHUNK_SIZE_TOKENS`: Maximum tokens per chunk (default: 100000)
-- `CHUNK_OVERLAP_TOKENS`: Overlap between chunks (default: 500)
-- `MAX_DOCUMENT_PAGES`: Maximum pages per document (default: 500)
-- `MAX_DOCUMENT_TOKENS`: Maximum tokens per document (default: 1000000)
-
-**Async Processing:**
-- `ASYNC_THREAD_POOL_SIZE`: Thread pool size (default: 10)
-- `AGENT_TIMEOUT_MINUTES`: Timeout per agent (default: 30)
-
-**Logging:**
-- `LOG_LEVEL`: Logging level (default: INFO)
-
-### Application Properties
-
-Configuration is in `src/main/resources/application.properties`. All values can be overridden with environment variables.
+For advanced configuration options, see [DOCKER-GUIDE.md](DOCKER-GUIDE.md).
 
 ## Building and Testing
 
-All building and testing happens inside Docker containers - no local Java or Maven installation required.
+All building and testing happens inside Docker containers.
 
-### Build
-
+**Build:**
 ```bash
-# Build is automatic when starting Docker
 docker-compose up --build
-
-# Force rebuild
-docker-compose build --no-cache
-
-# Or using Make
-make rebuild
 ```
 
-### Testing
-
+**Run Tests:**
 ```bash
-# Run all tests in Docker container
 docker-compose exec app mvn test
-
-# Or using Make
-make test
-
-# Run specific test class
-docker-compose exec app mvn test -Dtest=DocumentControllerTest
-
-# Run with coverage
-docker-compose exec app mvn test jacoco:report
-
-# View coverage report
-docker-compose exec app cat target/site/jacoco/index.html
 ```
 
-**Test Coverage:**
-- 152 tests passing (146 unit + 6 integration)
-- Unit tests for all components
-- Integration tests with Testcontainers
-- Property-based tests with jqwik
+For detailed testing information, see [DOCKER-GUIDE.md](DOCKER-GUIDE.md).
 
 ## Architecture
 
@@ -634,83 +273,30 @@ The system includes comprehensive error handling:
 
 ### Common Issues
 
-**1. "NVIDIA API key not configured"**
-- Ensure `NVIDIA_API_KEY` environment variable is set
-- Verify API key is valid at https://build.nvidia.com/
+**"NVIDIA API key not configured"**
+- Ensure `NVIDIA_API_KEY` is set in `.env`
+- Verify the key is valid at https://build.nvidia.com/
 
-**2. "Database connection failed"**
-- Check PostgreSQL is running
-- Verify `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`
-- Ensure database `aipanelist` exists
+**"Database connection failed"**
+- Wait 30-60 seconds for PostgreSQL to start
+- Restart: `docker-compose restart app`
 
-**3. "File upload failed: File too large"**
-- Maximum file size is 50MB
-- Maximum document size is 500 pages or 1M tokens
+**"File upload failed"**
+- Check file is a valid PDF
+- Maximum size: 50MB, 500 pages
 
-**4. "Circuit breaker is OPEN"**
-- NVIDIA API is experiencing issues
-- Wait 1 minute for circuit breaker to reset
-- Check NVIDIA API status
-
-**5. "All agents failed"**
-- Check NVIDIA API connectivity
-- Review logs for specific agent errors
-- Verify API rate limits not exceeded
-
-### Logs
-
+**View Logs:**
 ```bash
-# View application logs (Docker)
 docker-compose logs -f app
-
-# View specific service logs
-docker-compose logs -f postgres
-
-# View logs with timestamps
-docker-compose logs -f --timestamps app
 ```
+
+For more troubleshooting help, see [DOCKER-GUIDE.md](DOCKER-GUIDE.md).
 
 ## Development
 
-### Project Structure
-
-```
-src/
-├── main/
-│   ├── java/com/aipanelist/
-│   │   ├── agents/              # AI agent implementations
-│   │   ├── api/                 # REST controllers and DTOs
-│   │   ├── async/               # Async processing service
-│   │   ├── config/              # Spring configuration
-│   │   ├── consensus/           # Consensus generation
-│   │   ├── integration/         # NVIDIA API client
-│   │   ├── model/               # Domain models and entities
-│   │   ├── orchestration/       # Panel orchestration
-│   │   ├── processing/          # Document processing
-│   │   ├── repository/          # JPA repositories
-│   │   └── upload/              # PDF upload service
-│   └── resources/
-│       ├── application.properties
-│       └── logback-spring.xml
-└── test/
-    └── java/com/aipanelist/     # Unit and integration tests
-```
-
-### Adding New Agents
-
-To add a new specialized agent:
-
-1. Create new class extending `AIAgent`
-2. Implement `getSystemPrompt()` with agent-specific instructions
-3. Add new `AgentType` enum value
-4. Register agent in `PanelOrchestrator.createPanel()`
-
-### Testing Strategy
-
-- **Unit Tests**: Test individual components in isolation
-- **Integration Tests**: Test component interactions with Testcontainers
-- **Property Tests**: Test invariants with jqwik (100+ iterations)
-- **TDD Approach**: Write tests before implementation
+For development setup, debugging, and contributing to the codebase, see:
+- **[DOCKER-GUIDE.md](DOCKER-GUIDE.md)** - Development mode setup
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
 
 ## Contributing
 

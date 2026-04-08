@@ -1,6 +1,6 @@
 # Docker Deployment Guide
 
-> **🐳 Docker-Only Architecture**: This project is designed to run entirely in Docker. No local Java, Maven, PostgreSQL, or other dependencies are required. Just Docker Desktop and an NVIDIA API key!
+This comprehensive guide explains how to deploy and manage the AI Panelist System using Docker.
 
 This comprehensive guide explains how to deploy the AI Panelist System using Docker and Docker Compose with multiple deployment modes.
 
@@ -150,40 +150,6 @@ Development environment with hot reload and debugging capabilities.
 ```bash
 # Windows
 docker-start.bat
-# Select option 2 (Development)
-
-# Linux/macOS
-make dev
-```
-
-**Features:**
-- Hot reload on code changes
-- Remote debugging on port 5005
-- TRACE level logging
-- PgAdmin included (http://localhost:5050)
-- Source code mounted as volume
-- Maven cache persistence
-
-**Access:**
-- Application: http://localhost:8080
-- PgAdmin: http://localhost:5050 (admin@aipanelist.local / admin)
-- Debug Port: 5005
-
-**IDE Debug Configuration:**
-```
-Host: localhost
-Port: 5005
-Type: Remote JVM Debug
-```
-
-### 3. Production with Nginx
-
-Production deployment with Nginx reverse proxy for SSL/TLS and load balancing.
-
-**Start:**
-```bash
-# Windows
-docker-start.bat
 # Select option 3 (Production with Nginx)
 
 # Linux/macOS
@@ -279,7 +245,7 @@ docker run --rm -v aipanelist_postgres-data:/data -v $(pwd):/backup alpine tar c
 
 ## API Endpoints
 
-Once running, the API is available at `http://localhost:8080` (or port 80 with Nginx):
+Once running, the API is available at `http://localhost:8080`:
 
 ### Document Upload
 ```bash
@@ -379,7 +345,7 @@ Response:
 **docker-start.bat** - Interactive startup
 ```bash
 docker-start.bat
-# Choose: 1=Production, 2=Development, 3=Production+Nginx
+# Choose: 1=Production, 2=Development
 ```
 
 **docker-stop.bat** - Interactive shutdown
@@ -547,7 +513,6 @@ make stats
 **Expected Resource Usage:**
 - Application: 512MB-2GB RAM, 1-2 CPU cores
 - PostgreSQL: 256MB-1GB RAM, 0.5-1 CPU core
-- Nginx (if enabled): 50-100MB RAM, 0.1-0.5 CPU core
 
 ### Log Monitoring
 
@@ -693,7 +658,10 @@ grafana:
    docker-compose exec app df -h /app/data
    ```
 
-4. For Nginx mode, increase client_max_body_size in `nginx/nginx.conf`
+4. Check available disk space:
+   ```bash
+   docker-compose exec app df -h /app/data
+   ```
 
 #### Slow processing or timeouts
 

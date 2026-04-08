@@ -12,8 +12,18 @@ import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.SolidBorder;
-import com.itextpdf.layout.element.*;
-import com.itextpdf.layout.properties.*;
+import com.itextpdf.layout.element.AreaBreak;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Div;
+import com.itextpdf.layout.element.LineSeparator;
+import com.itextpdf.layout.element.List;
+import com.itextpdf.layout.element.ListItem;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.HorizontalAlignment;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
+import com.itextpdf.layout.properties.VerticalAlignment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -168,8 +178,9 @@ public class StyledPDFExportServiceImpl implements PDFExportService {
             .setFontSize(11);
         
         for (String agent : agents) {
-            agentList.add(new ListItem(agent)
-                .setFontColor(TEXT_COLOR));
+            ListItem item = new ListItem(agent);
+            item.setFontColor(TEXT_COLOR);
+            agentList.add(item);
         }
         
         Table agentTable = new Table(1);

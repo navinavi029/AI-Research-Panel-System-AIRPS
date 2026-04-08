@@ -1,17 +1,19 @@
-# Swagger UI Testing Guide
+# API Testing Guide
+
+This guide shows you how to test the AI Research Panel System API using Swagger UI or cURL.
 
 ## Quick Start
 
-1. **Open Swagger UI in your browser:**
-   ```
-   http://localhost:8080/swagger-ui.html
-   ```
+**Open Swagger UI in your browser:**
+```
+http://localhost:8080/swagger-ui.html
+```
 
-2. **You should see the API documentation with 4 endpoints:**
-   - POST `/api/documents/upload` - Upload a PDF
-   - GET `/api/documents/{documentId}/status` - Check processing status
-   - GET `/api/documents/{documentId}/results` - Get consensus report
-   - GET `/api/documents/{documentId}/results/detailed` - Get detailed results
+**Available Endpoints:**
+- POST `/api/documents/upload` - Upload a PDF
+- GET `/api/documents/{documentId}/status` - Check processing status
+- GET `/api/documents/{documentId}/results` - Get consensus report
+- GET `/api/documents/{documentId}/results/detailed` - Get detailed results
 
 ---
 
