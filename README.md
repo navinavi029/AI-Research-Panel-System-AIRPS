@@ -1,325 +1,526 @@
-# AI Research Panel System (AI-RPS)
+# AI Research Panel System
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.org/projects/jdk/21/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.1-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)](https://www.postgresql.org/)
-[![CI](https://github.com/navinavi029/AI-Research-Panel-System-AIRPS/workflows/CI/badge.svg)](https://github.com/navinavi029/AI-Research-Panel-System-AIRPS/actions)
-[![Coverage](https://img.shields.io/badge/coverage-87%25-brightgreen.svg)](https://github.com/navinavi029/AI-Research-Panel-System-AIRPS)
 
-> **🐳 Docker-First Architecture**: This project runs entirely in Docker containers. No local Java, Maven, PostgreSQL, or other dependencies required. Just install Docker Desktop and you're ready to go!
-
-A Java Spring Boot application that orchestrates multi-agent AI analysis of research documents using NVIDIA models.
-
-## Overview
-
-The AI Research Panel System (AI-RPS) enables users to upload PDF research documents and receive comprehensive analysis from multiple AI agents acting as a deliberative panel. The system leverages NVIDIA free models to power multi-agent analysis, where AI panelists independently review the study and then collaborate to produce a consensus output.
-
-## Features
-
-- PDF document upload and validation (up to 50MB, max 500 pages or 1M tokens)
-- Text extraction with logical reading order preservation
-- Intelligent chunking for large documents (100K token chunks with 500-token overlap)
-- Multi-agent AI analysis with 6 specialized agents running in parallel
-- Consensus generation from individual agent reports
-- Asynchronous processing with real-time status tracking
-- Comprehensive error handling with retry logic and circuit breaker
-- Docker containerization for easy deployment
-
-## Technology Stack
-
-- **Java 21**
-- **Spring Boot 3.2.1**
-- **Spring Data JPA** with PostgreSQL 15
-- **Apache PDFBox** for PDF processing
-- **NVIDIA API** (llama-3.1-nemotron-70b-instruct)
-- **Resilience4j** for circuit breaker pattern
-- **jqwik** for property-based testing
-- **Docker** and **Docker Compose** for containerization
-
-## Prerequisites
-
-**Only 2 things required:**
-
-1. **Docker Desktop** - [Download here](https://www.docker.com/products/docker-desktop)
-2. **NVIDIA API Key** (free) - [Get it here](https://build.nvidia.com/)
-
-That's it! No Java, Maven, PostgreSQL, or any other local dependencies needed. Everything runs in Docker containers.
-
-## Quick Start
-
-**New to the system?** See [GETTING-STARTED.md](GETTING-STARTED.md) for a detailed step-by-step guide.
-
-### 1. Prerequisites
-
-- **Docker Desktop** - [Download here](https://www.docker.com/products/docker-desktop)
-- **NVIDIA API Key** (free) - [Get it here](https://build.nvidia.com/)
-
-### 2. Configure Environment
-
-```bash
-# Create environment file
-cp .env.example .env
-
-# Edit .env and add your NVIDIA API key
-NVIDIA_API_KEY=your-api-key-here
-```
-
-### 3. Start the Application
-
-**Windows:**
-```cmd
-docker-start.bat
-```
-
-**Linux/Mac:**
-```bash
-make up
-```
-
-### 4. Verify It's Working
-
-Open your browser: http://localhost:8080/actuator/health
-
-You should see `{"status":"UP"}`
-
-### 5. Test the API
-
-Visit the interactive API documentation:
-```
-http://localhost:8080/swagger-ui.html
-```
-
-See [API-GUIDE.md](API-GUIDE.md) for detailed API testing instructions.
+A Spring Boot application that orchestrates multi-agent AI analysis of research documents using NVIDIA models. Upload a PDF and receive a comprehensive consensus report from 6 specialized AI agents running in parallel, exportable as JSON or a styled PDF.
 
 ---
 
-## Documentation
+## Table of Contents
 
-📚 **[Complete Documentation Guide](.github/DOCUMENTATION.md)** - Visual guide to all documentation
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+- [API Reference](#api-reference)
+- [Processing Pipeline](#processing-pipeline)
+- [AI Agents](#ai-agents)
+- [Consensus Engine](#consensus-engine)
+- [PDF Export](#pdf-export)
+- [Architecture](#architecture)
+- [Database Schema](#database-schema)
+- [Error Handling](#error-handling)
+- [Troubleshooting](#troubleshooting)
 
-- **[GETTING-STARTED.md](GETTING-STARTED.md)** - Complete setup guide for new users
-- **[API-GUIDE.md](API-GUIDE.md)** - API endpoints and testing guide
-- **[DOCKER-GUIDE.md](DOCKER-GUIDE.md)** - Docker deployment and management
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute to the project
-- **[SECURITY.md](SECURITY.md)** - Security policy and best practices
+---
 
-## Docker Architecture
+## Prerequisites
 
-The application runs in Docker containers with no local dependencies required. See [DOCKER-GUIDE.md](DOCKER-GUIDE.md) for comprehensive deployment documentation.
+1. **Docker Desktop** — [Download](https://www.docker.com/products/docker-desktop)
+2. **NVIDIA API Key** (free) — [Get one at build.nvidia.com](https://build.nvidia.com/)
 
-**Container Services:**
-- **aipanelist-app** - Spring Boot application (port 8080)
-- **aipanelist-postgres** - PostgreSQL 15 database
-- **aipanelist-pgadmin** - Database UI (dev mode only)
+No local Java, Maven, or PostgreSQL required. Everything runs in Docker.
 
-**Deployment Modes:**
-- **Production** - Optimized for production use
-- **Development** - Hot reload, debugging, PgAdmin
+---
 
-## API Documentation
+## Quick Start
 
-The system provides a RESTful API for document analysis. See [API-GUIDE.md](API-GUIDE.md) for detailed testing instructions.
-
-**Base URL:** `http://localhost:8080/api`
-
-**Interactive Documentation:** http://localhost:8080/swagger-ui.html
-
-### Key Endpoints
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/documents/upload` | POST | Upload PDF for analysis |
-| `/api/documents/{id}/status` | GET | Check processing status |
-| `/api/documents/{id}/results` | GET | Get consensus report |
-| `/api/documents/{id}/results/detailed` | GET | Get all agent reports |
-
-**Example Usage:**
-
-```bash
-# Upload a document
-curl -X POST http://localhost:8080/api/documents/upload \
-  -F "file=@research-paper.pdf"
-
-# Check status
-curl http://localhost:8080/api/documents/{documentId}/status
-
-# Get results
-curl http://localhost:8080/api/documents/{documentId}/results
+```cmd
+start.bat
 ```
 
-## AI Agents
+The script handles everything:
+- Checks Docker is running
+- Creates `.env` from `.env.example` if missing
+- Prompts for your NVIDIA API key if not configured
+- Builds and starts all containers
+- Waits for health check
+- Opens Swagger UI automatically
 
-The system employs 6 specialized AI agents that analyze documents in parallel:
+**Access points after startup:**
 
-1. **Lead Analyst**: Deep critical analysis and research validity assessment
-2. **General Analyst**: Comprehensive document review and overall evaluation
-3. **Methodology Reviewer**: Methodology and statistical analysis evaluation
-4. **Literature Reviewer**: Literature context, citations, and positioning
-5. **Quick Screener**: Initial screening and key claims identification
-6. **Fact Extractor**: Fact extraction and summarization
+| URL | Purpose |
+|-----|---------|
+| `http://localhost:8080/swagger-ui.html` | Interactive API docs |
+| `http://localhost:8080/actuator/health` | Health check |
+| `http://localhost:8080/api/documents/upload` | Upload endpoint |
 
-Each agent processes the document independently, then their findings are synthesized into a consensus report.
+---
 
 ## Configuration
 
-All configuration is managed through the `.env` file. See `.env.example` for all available options.
+Copy `.env.example` to `.env` and configure:
 
-**Required:**
 ```env
+# ── Required ──────────────────────────────────────────
 NVIDIA_API_KEY=your-api-key-here
-```
 
-**Optional (with defaults):**
-```env
+# ── Database ──────────────────────────────────────────
 POSTGRES_PASSWORD=changeme
+POSTGRES_PORT=5432
+
+# ── Server ────────────────────────────────────────────
 SERVER_PORT=8080
+
+# ── Logging ───────────────────────────────────────────
 LOG_LEVEL_ROOT=INFO
 LOG_LEVEL_APP=DEBUG
-JAVA_OPTS=-Xms512m -Xmx2048m
+
+# ── JVM ───────────────────────────────────────────────
+JAVA_OPTS=-Xms512m -Xmx2048m -XX:+UseG1GC
 ```
 
-For advanced configuration options, see [DOCKER-GUIDE.md](DOCKER-GUIDE.md).
+**All configuration properties:**
 
-## Building and Testing
+| Property | Default | Description |
+|----------|---------|-------------|
+| `NVIDIA_API_KEY` | — | **Required.** NVIDIA API key |
+| `NVIDIA_API_ENDPOINT` | `https://integrate.api.nvidia.com/v1` | NVIDIA API base URL |
+| `NVIDIA_API_MODEL` | `meta/llama-3.3-70b-instruct` | Model used for all agents and consensus |
+| `POSTGRES_PASSWORD` | `changeme` | PostgreSQL password |
+| `POSTGRES_PORT` | `5432` | PostgreSQL host port |
+| `SERVER_PORT` | `8080` | Application HTTP port |
+| `LOG_LEVEL_ROOT` | `INFO` | Root log level |
+| `LOG_LEVEL_APP` | `DEBUG` | Application log level |
+| `JAVA_OPTS` | `-Xms512m -Xmx2048m -XX:+UseG1GC` | JVM options |
 
-All building and testing happens inside Docker containers.
+**Advanced (optional, set in `docker-compose.yml`):**
 
-**Build:**
+| Property | Default | Description |
+|----------|---------|-------------|
+| `NVIDIA_API_RATE_LIMIT` | `60` | Max requests per minute to NVIDIA API |
+| `NVIDIA_API_MAX_CONNECTIONS` | `10` | Max concurrent HTTP connections |
+| `PROCESSING_CHUNK_SIZE` | `100000` | Tokens per document chunk |
+| `PROCESSING_MAX_RETRIES` | `3` | Retry attempts per chunk |
+| `ASYNC_CORE_POOL_SIZE` | `10` | Core async thread pool size |
+| `ASYNC_MAX_POOL_SIZE` | `20` | Max async thread pool size |
+
+---
+
+## API Reference
+
+**Base URL:** `http://localhost:8080/api/documents`
+
+### POST `/upload`
+
+Upload a PDF document for analysis.
+
+**Request:** `multipart/form-data`
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `file` | File | Yes | PDF file, max 50MB, max 500 pages |
+
+**Response `200 OK`:**
+```json
+{
+  "documentId": "a1b2c3d4-...",
+  "filename": "research-paper.pdf",
+  "uploadedAt": "2026-04-26T09:00:00",
+  "status": "UPLOADED"
+}
+```
+
+**Error codes:**
+
+| Code | HTTP | Meaning |
+|------|------|---------|
+| `INVALID_FILE` | 400 | Empty file or not a PDF |
+| `FILE_TOO_LARGE` | 413 | File exceeds 50MB |
+| `INVALID_PDF` | 400 | Corrupted or unreadable PDF |
+
+---
+
+### GET `/{documentId}/status`
+
+Poll processing status and per-agent progress.
+
+**Response `200 OK`:**
+```json
+{
+  "documentId": "a1b2c3d4-...",
+  "status": "ANALYZING",
+  "agentProgress": [
+    {
+      "agentId": "lead-analyst-...",
+      "agentType": "LEAD_ANALYST",
+      "chunksCompleted": 2,
+      "totalChunks": 3
+    }
+  ]
+}
+```
+
+**Processing statuses:**
+
+| Status | Meaning |
+|--------|---------|
+| `UPLOADED` | File received, queued for processing |
+| `PROCESSING` | Text extraction in progress |
+| `ANALYZING` | 6 agents analyzing in parallel |
+| `DELIBERATING` | Consensus engine synthesizing |
+| `COMPLETE` | Results ready |
+| `FAILED` | Processing failed — check `errorMessage` |
+
+---
+
+### GET `/{documentId}/results`
+
+Get the consensus report as JSON.
+
+**Response `200 OK`:**
+```json
+{
+  "reportId": "consensus-...",
+  "documentId": "a1b2c3d4-...",
+  "commonThemes": "...",
+  "agreements": "...",
+  "disagreements": "...",
+  "unifiedRecommendations": "...",
+  "attributedInsights": "...",
+  "generatedAt": "2026-04-26T09:15:00",
+  "agentReportsIncluded": 6
+}
+```
+
+Returns `DocumentStatus` (with HTTP 200) if still processing.
+
+---
+
+### GET `/{documentId}/results/detailed`
+
+Get all 6 individual agent reports plus the consensus report.
+
+**Response `200 OK`:**
+```json
+{
+  "documentId": "a1b2c3d4-...",
+  "agentReports": [
+    {
+      "reportId": "...",
+      "agentType": "LEAD_ANALYST",
+      "keyFindings": "...",
+      "strengths": "...",
+      "weaknesses": "...",
+      "recommendations": "...",
+      "completedAt": "...",
+      "chunksAnalyzed": 3,
+      "chunksFailed": 0
+    }
+  ],
+  "consensusReport": { ... }
+}
+```
+
+---
+
+### GET `/{documentId}/results/pdf`
+
+Download the consensus report as a styled PDF.
+
+**Response `200 OK`:**
+- Content-Type: `application/pdf`
+- Content-Disposition: `attachment; filename="analysis-report-{documentId}.pdf"`
+- Body: Binary PDF
+
+---
+
+**Common error response format (all endpoints):**
+```json
+{
+  "code": "DOCUMENT_NOT_FOUND",
+  "message": "Document a1b2c3d4 not found",
+  "documentId": "a1b2c3d4-...",
+  "details": {}
+}
+```
+
+**Example workflow:**
 ```bash
-docker-compose up --build
+# 1. Upload
+curl -X POST http://localhost:8080/api/documents/upload \
+  -F "file=@paper.pdf"
+# → { "documentId": "abc123" }
+
+# 2. Poll until COMPLETE
+curl http://localhost:8080/api/documents/abc123/status
+
+# 3. Get results
+curl http://localhost:8080/api/documents/abc123/results
+
+# 4. Download PDF
+curl -O -J http://localhost:8080/api/documents/abc123/results/pdf
 ```
 
-**Run Tests:**
-```bash
-docker-compose exec app mvn test
+---
+
+## Processing Pipeline
+
+```
+Upload PDF
+    │
+    ▼
+Validate (size ≤50MB, type=PDF, ≤500 pages)
+    │
+    ▼
+Store to /app/data/uploads/{documentId}.pdf
+    │
+    ▼ (async background thread)
+Extract Text (Apache PDFBox, reading order preserved)
+    │
+    ▼
+Chunk Document
+    ├── ≤100K tokens → single chunk
+    └── >100K tokens → semantic chunking
+                        (section headers → paragraph breaks → sentence endings)
+                        (100K token target, 500-token overlap)
+    │
+    ▼
+Parallel Agent Analysis (6 agents × ExecutorService, 30-min timeout)
+    ├── Lead Analyst
+    ├── General Analyst
+    ├── Methodology Reviewer
+    ├── Literature Reviewer
+    ├── Quick Screener
+    └── Fact Extractor
+         │
+         └── Each agent: sequential chunk processing
+                          retry (3× exponential backoff: 1s, 2s, 4s)
+                          context carryover between chunks
+    │
+    ▼
+Consensus Engine (NVIDIA model synthesizes all agent reports)
+    │
+    ▼
+COMPLETE — results available via API
 ```
 
-For detailed testing information, see [DOCKER-GUIDE.md](DOCKER-GUIDE.md).
+**Status transitions:** `UPLOADED → PROCESSING → ANALYZING → DELIBERATING → COMPLETE`  
+**On any failure:** `→ FAILED` (error message stored on document)
+
+---
+
+## AI Agents
+
+All 6 agents run in parallel. Each processes document chunks sequentially, carrying context forward between chunks, then synthesizes a unified report.
+
+| Agent | Specialization |
+|-------|---------------|
+| **Lead Analyst** | Deep critical analysis — methodological rigor, validity of conclusions, scientific quality, key limitations |
+| **General Analyst** | Holistic review — content quality, organization, clarity, completeness, logical flow |
+| **Methodology Reviewer** | Research design — experimental design, sampling, statistical validity, reproducibility, bias control |
+| **Literature Reviewer** | Scholarly context — citation quality, theoretical framework, novelty, positioning relative to prior work |
+| **Quick Screener** | Rapid triage — main claims, red flags, high-priority issues requiring deeper scrutiny |
+| **Fact Extractor** | Structured extraction — numerical data, sample characteristics, methodological parameters, primary outcomes |
+
+**Per-agent output structure:**
+- Key Findings
+- Strengths
+- Weaknesses
+- Recommendations
+- Chunks analyzed / failed
+
+**Retry behavior per chunk:**
+- 3 attempts with exponential backoff (1s → 2s → 4s)
+- Retryable: 5xx errors, network timeouts, 429 rate limits
+- Non-retryable: 4xx errors (except 429)
+- Failed chunks are noted in the report; analysis continues with remaining chunks
+
+---
+
+## Consensus Engine
+
+After all agents complete, the consensus engine calls the NVIDIA model once more to synthesize all 6 reports into a unified output.
+
+**System prompt:** *"You are an expert at synthesizing multiple expert analyses into a unified consensus report."*
+
+**Output sections:**
+
+| Section | Content |
+|---------|---------|
+| Common Themes | Themes that appeared across multiple agent analyses |
+| Agreements | Points where agents reached consensus |
+| Disagreements | Areas where agents had differing perspectives |
+| Unified Recommendations | Synthesized recommendations from the full panel |
+| Attributed Insights | Unique contributions attributed to specific agents |
+
+**Graceful degradation:** If some agents fail, consensus still generates from the available reports. Only if all agents fail does the document status become `FAILED`.
+
+---
+
+## PDF Export
+
+The PDF report is generated with iText7 and includes:
+
+1. **Cover page** — title, subtitle, metadata table (documentId, reportId, generated timestamp, agent count), contributing agent list
+2. **Table of contents** — links to all 5 sections
+3. **Content sections** — each with a color-coded header, description, and formatted content box
+4. **Page footers** — page numbers and "AI Panelist System • Powered by NVIDIA AI"
+
+**Color scheme:**
+
+| Color | Hex | Used for |
+|-------|-----|---------|
+| Primary | `#2962FF` | Headers, cover, common themes, recommendations |
+| Success | `#10B981` | Agreements section |
+| Warning | `#F59E0B` | Disagreements section |
+| Secondary | `#646464` | Subtitles, footers, attributed insights |
+
+---
 
 ## Architecture
 
-### System Components
-
 ```
-┌─────────────┐
-│   Client    │
-└──────┬──────┘
-       │ HTTP
-       ▼
-┌─────────────────────────────────────┐
-│      DocumentController (API)       │
-└──────┬──────────────────────────────┘
-       │
-       ▼
-┌─────────────────────────────────────┐
-│    AsyncAnalysisService (Async)     │
-└──────┬──────────────────────────────┘
-       │
-       ├──► PDFUploadService
-       │
-       ├──► DocumentProcessor (Extract)
-       │
-       ├──► ChunkProcessor (Chunk)
-       │
-       ├──► PanelOrchestrator
-       │    └──► 6 AI Agents (Parallel)
-       │         └──► NVIDIAModelClient
-       │
-       └──► ConsensusEngine
-            └──► NVIDIAModelClient
+┌─────────────────────────────────────────────────────┐
+│                   Docker Network                     │
+│                                                     │
+│  ┌──────────────────────┐   ┌────────────────────┐  │
+│  │   aipanelist-app     │   │ aipanelist-postgres │  │
+│  │   Spring Boot :8080  │──▶│  PostgreSQL 15      │  │
+│  │                      │   │  :5432              │  │
+│  │  DocumentController  │   └────────────────────┘  │
+│  │  AsyncAnalysisService│                           │
+│  │  PanelOrchestrator   │                           │
+│  │  ConsensusEngine     │──▶  NVIDIA API            │
+│  │  PDFExportService    │     (external)            │
+│  └──────────────────────┘                           │
+└─────────────────────────────────────────────────────┘
 ```
 
-### Processing Flow
+**Key components:**
 
-1. **Upload**: User uploads PDF via REST API
-2. **Validation**: File size, type, and structure validated
-3. **Extraction**: Text extracted with reading order preserved
-4. **Chunking**: Large documents split into 100K token chunks
-5. **Analysis**: 6 agents analyze in parallel (5 min/chunk target)
-6. **Consensus**: Findings synthesized into unified report (2 min target)
-7. **Results**: Consensus report available via API
+| Component | Responsibility |
+|-----------|---------------|
+| `DocumentController` | REST API, request validation |
+| `PDFUploadService` | File storage, document entity creation |
+| `AsyncAnalysisService` | Pipeline orchestration in background thread |
+| `DocumentProcessor` | PDF text extraction (PDFBox) |
+| `ChunkProcessor` | Semantic document chunking |
+| `PanelOrchestrator` | Spawns and manages 6 parallel agents |
+| `AIAgent` (×6) | Per-agent analysis with retry logic |
+| `NVIDIAModelClient` | HTTP client with pooling, rate limiting, circuit breaker |
+| `ConsensusEngine` | Synthesizes agent reports into consensus |
+| `PDFExportService` | Generates styled PDF report (iText7) |
 
-### Database Schema
+**NVIDIA API client features:**
+- Connection pool: max 10 concurrent connections
+- Rate limiter: semaphore-based, 60 req/min (configurable)
+- Timeouts: 30s connection, 300s response
+- Circuit breaker: 50% failure threshold, 10-call window, 60s open duration
+- 429 handling: reads `Retry-After` header and waits
 
-- `documents`: Document metadata and status
-- `extracted_documents`: Extracted text content
-- `document_chunks`: Document chunks for large files
-- `analysis_reports`: Individual agent reports
-- `chunk_analyses`: Per-chunk analysis results
-- `consensus_reports`: Final consensus reports
-- `agent_progress`: Real-time agent progress tracking
+---
+
+## Database Schema
+
+| Table | Purpose |
+|-------|---------|
+| `documents` | Document metadata, status, page/token counts |
+| `extracted_documents` | Full extracted text (LOB) |
+| `document_chunks` | Chunked text with sequence numbers and byte offsets |
+| `analysis_reports` | Per-agent reports with findings, strengths, weaknesses, recommendations |
+| `chunk_analyses` | Per-chunk analysis results with context summaries |
+| `consensus_reports` | Final synthesized consensus output |
+| `agent_progress` | Real-time chunk completion tracking per agent |
+
+**Relationships:**
+```
+documents (1) ──── (1) extracted_documents
+documents (1) ──── (N) document_chunks
+documents (1) ──── (N) analysis_reports
+documents (1) ──── (1) consensus_reports
+documents (1) ──── (N) agent_progress
+analysis_reports (1) ── (N) chunk_analyses
+```
+
+Schema is managed by Hibernate (`ddl-auto=update`) — no manual migrations needed.
+
+---
 
 ## Error Handling
 
-The system includes comprehensive error handling:
+**HTTP status codes:**
 
-- **Retry Logic**: 3 attempts with exponential backoff for transient failures
-- **Circuit Breaker**: Protects against cascading failures (50% threshold, 1-min open)
-- **Graceful Degradation**: Continues with remaining agents if some fail
-- **Detailed Errors**: Descriptive error messages with context
-- **Structured Logging**: All errors logged with documentId, stage, and stack traces
+| Code | Meaning |
+|------|---------|
+| `400` | Invalid file, validation failure |
+| `404` | Document not found |
+| `409` | Document still processing |
+| `413` | File exceeds 50MB |
+| `422` | Text extraction failed |
+| `500` | Unexpected server error |
+| `502` | NVIDIA API error |
+| `503` | Max retries exceeded |
 
-## Performance
+All error responses follow the same JSON structure:
+```json
+{
+  "code": "ERROR_CODE",
+  "message": "Human-readable description",
+  "documentId": "...",
+  "details": {}
+}
+```
 
-- **Target Processing Time**: 5 minutes per 100K token chunk per agent
-- **Consensus Generation**: 2 minutes target
-- **Parallel Processing**: 6 agents run concurrently
-- **Connection Pooling**: Max 10 concurrent NVIDIA API connections
-- **Rate Limiting**: 60 requests/minute (configurable)
+---
 
 ## Troubleshooting
 
-### Common Issues
-
-**"NVIDIA API key not configured"**
-- Ensure `NVIDIA_API_KEY` is set in `.env`
-- Verify the key is valid at https://build.nvidia.com/
-
-**"Database connection failed"**
-- Wait 30-60 seconds for PostgreSQL to start
-- Restart: `docker-compose restart app`
-
-**"File upload failed"**
-- Check file is a valid PDF
-- Maximum size: 50MB, 500 pages
-
-**View Logs:**
-```bash
-docker-compose logs -f app
+**API key not working**
+```
+Check NVIDIA_API_KEY in .env
+Validate at https://build.nvidia.com/
 ```
 
-For more troubleshooting help, see [DOCKER-GUIDE.md](DOCKER-GUIDE.md).
+**Document stuck in ANALYZING**
+```bash
+docker-compose logs -f app   # look for agent errors
+```
 
-## Development
+**Database connection refused**
+```bash
+docker-compose restart app   # postgres may still be starting
+```
 
-For development setup, debugging, and contributing to the codebase, see:
-- **[DOCKER-GUIDE.md](DOCKER-GUIDE.md)** - Development mode setup
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
+**Out of memory**
+```
+Increase JAVA_OPTS in .env:
+JAVA_OPTS=-Xms512m -Xmx4096m -XX:+UseG1GC
+```
 
-## Contributing
+**Useful commands:**
+```bash
+# Live logs
+docker-compose logs -f app
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on:
+# Restart app only
+docker-compose restart app
 
-- How to report bugs
-- How to suggest features
-- Development setup
-- Coding standards
-- Pull request process
+# Stop everything (keep data)
+docker-compose down
 
-## Community
+# Stop and wipe all data
+docker-compose down -v
 
-- **Issues**: [GitHub Issues](https://github.com/navinavi029/AI-Research-Panel-System-AIRPS/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/navinavi029/AI-Research-Panel-System-AIRPS/discussions)
-- **Security**: See [SECURITY.md](SECURITY.md) for reporting vulnerabilities
+# Rebuild after code changes
+docker-compose up -d --build app
+```
+
+---
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-Copyright © 2024 AI Research Panel System Contributors.
-
-## Support
-
-For issues, questions, or contributions, please contact the development team.
+MIT License — see [LICENSE](LICENSE) for details.

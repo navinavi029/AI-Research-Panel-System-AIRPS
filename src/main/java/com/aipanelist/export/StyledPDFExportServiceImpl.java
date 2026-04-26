@@ -51,10 +51,12 @@ public class StyledPDFExportServiceImpl implements PDFExportService {
     @Override
     public byte[] generatePDFReport(DetailedResultsDTO results) throws PDFGenerationException {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            
+
             PdfWriter writer = new PdfWriter(outputStream);
+            writer.setSmartMode(true);
             PdfDocument pdfDoc = new PdfDocument(writer);
-            Document document = new Document(pdfDoc, PageSize.A4);
+            // Disable immediate flush so all pages remain writable for footer pass
+            Document document = new Document(pdfDoc, PageSize.A4, false);
             document.setMargins(40, 40, 60, 40);
             
             ConsensusReport consensus = results.getConsensusReport();
@@ -84,7 +86,7 @@ public class StyledPDFExportServiceImpl implements PDFExportService {
                            "Unique contributions from each specialized agent", SECONDARY_COLOR, "👥");
             
             // Add footer to all pages
-            addPageFooters(pdfDoc);
+            addPageFooters(pdfDoc, document);
             
             document.close();
             log.info("Styled PDF report generated successfully for document {}", results.getDocumentId());
@@ -297,34 +299,30 @@ public class StyledPDFExportServiceImpl implements PDFExportService {
         document.add(separator);
     }
     
-    private void addPageFooters(PdfDocument pdfDoc) {
+    private void addPageFooters(PdfDocument pdfDoc, Document document) {
         int totalPages = pdfDoc.getNumberOfPages();
-        
+
         for (int i = 1; i <= totalPages; i++) {
-            Document footerDoc = new Document(pdfDoc);
-            
             // Footer line
             LineSeparator line = new LineSeparator(new SolidLine(0.5f));
             line.setFixedPosition(i, 40, 30, 515);
-            footerDoc.add(line);
-            
+            document.add(line);
+
             // Page number
             Paragraph pageNum = new Paragraph("Page " + i + " of " + totalPages)
                 .setFontSize(8)
                 .setFontColor(SECONDARY_COLOR)
                 .setFixedPosition(i, 250, 20, 100)
                 .setTextAlignment(TextAlignment.CENTER);
-            footerDoc.add(pageNum);
-            
+            document.add(pageNum);
+
             // Footer text
-            Paragraph footerText = new Paragraph("AI Panelist System • Powered by NVIDIA AI")
+            Paragraph footerText = new Paragraph("AI Panelist System \u2022 Powered by NVIDIA AI")
                 .setFontSize(8)
                 .setFontColor(SECONDARY_COLOR)
                 .setFixedPosition(i, 350, 20, 200)
                 .setTextAlignment(TextAlignment.RIGHT);
-            footerDoc.add(footerText);
-            
-            footerDoc.close();
+            document.add(footerText);
         }
     }
 }

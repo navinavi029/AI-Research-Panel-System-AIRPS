@@ -251,7 +251,9 @@ public class GlobalExceptionHandler {
             documentId
         );
         
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+            .body(error);
     }
     
     /**

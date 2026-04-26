@@ -331,7 +331,7 @@ public class DocumentController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))
         )
     })
-    @GetMapping(value = "/{documentId}/results/pdf", produces = "application/pdf")
+    @GetMapping(value = "/{documentId}/results/pdf", produces = {"application/pdf", "application/json"})
     public ResponseEntity<?> exportResultsAsPDF(
             @Parameter(description = "Document ID returned from upload", required = true)
             @PathVariable String documentId) {
