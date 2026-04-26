@@ -10,21 +10,27 @@ A Spring Boot application that orchestrates multi-agent AI analysis of research 
 
 ---
 
-## Table of Contents
+## Documentation
 
-1. [Prerequisites](#prerequisites)
-2. [Quick Start](#quick-start)
-3. [Configuration](#configuration)
-4. [API Reference](#api-reference)
-5. [Processing Pipeline](#processing-pipeline)
-6. [AI Agents](#ai-agents)
-7. [Consensus Engine](#consensus-engine)
-8. [PDF Export](#pdf-export)
-9. [Architecture](#architecture)
-10. [Database Schema](#database-schema)
-11. [Error Handling](#error-handling)
-12. [Docker Management](#docker-management)
-13. [Troubleshooting](#troubleshooting)
+| Page | Description |
+|------|-------------|
+| [Overview](docs/01-overview.md) | What it is, how it works, tech stack |
+| [Getting Started](docs/02-getting-started.md) | Prerequisites, setup, first run |
+| [Configuration](docs/03-configuration.md) | All environment variables and settings |
+| [API Reference](docs/04-api-reference.md) | All endpoints with request/response details |
+| [Processing Pipeline](docs/05-pipeline.md) | How documents are processed end to end |
+| [AI Agents](docs/06-agents.md) | All 6 agents and their specializations |
+| [Consensus Engine](docs/07-consensus.md) | How agent reports are synthesized |
+| [PDF Export](docs/08-pdf-export.md) | PDF report structure and styling |
+| [Architecture](docs/09-architecture.md) | System design and component overview |
+| [Database Schema](docs/10-database.md) | Tables, entities, and relationships |
+| [Error Handling](docs/11-error-handling.md) | Error codes, retry behavior, resilience |
+| [Docker Management](docs/12-docker.md) | Container management and useful commands |
+| [Troubleshooting](docs/13-troubleshooting.md) | Common issues and fixes |
+
+---
+
+## Quick Reference
 
 ---
 
